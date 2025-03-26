@@ -1,0 +1,89 @@
+﻿@model List<Part>
+@{
+    ViewData["Title"] = "Part";
+}
+<link rel="stylesheet" href="~/css/Part.css" />
+<p id="page-title" hidden>part-lookup-tab</p>
+<div id="dynamic-page-title" style="display:flex;justify-content:center; font-size:xx-large;margin-top:3vh">Part Search</div>
+@{
+    if (Model != null)
+    {
+        <script>
+            var page_title = document.getElementById("dynamic-page-title");
+            var search_by = JSON.parse(sessionStorage.getItem("MapicsHistory")).search_by;
+            var search_phrase = JSON.parse(sessionStorage.getItem("MapicsHistory")).search_phrase;
+            switch (search_by) {
+                case "PartNum": search_by = "Part Number"; break;
+                case "PartDescription": search_by = "Part Description"; break;
+                case "PurComment": search_by = "Purch Comment"; break;
+                case "MfgComment": search_by = "Mfg Comment"; break;
+            }
+            page_title.innerHTML = search_by + ": " + search_phrase;
+        </script>
+    }
+}
+<div style="display:flex;">
+    <form action="/Part/PartSearch/" method="post">
+        <div id="search-title">
+            Search Criteria
+        </div>
+        <input type="text" name="search_phrase" id="search_phrase" required />
+        <div class="search-by-option">
+            <input type="radio" id="radio_part_num" name="search_field" value="PartNum" class="radio_btn" required />
+            <label for="radio_part_num">Part Number</label>
+        </div>
+        <div class="search-by-option">
+            <input type="radio" id="radio_part_desc" name="search_field" value="PartDescription" class="radio_btn" required />
+            <label for="radio_part_desc">Part Description</label>
+        </div>
+        <div class="search-by-option">
+            <input type="radio" id="radio_pur_comments" name="search_field" value="PurComment" class="radio_btn" required />
+            <label for="radio_pur_comments">Purch Comment</label>
+        </div>
+        <div class="search-by-option">
+            <input type="radio" id="radio_mfg_comments" name="search_field" value="MfgComment" class="radio_btn" required />
+            <label for="radio_mfg_comments">Mfg Comment</label>
+        </div>
+        <div >
+            <input type="submit" value="Search"  class="submit-button" onclick="save_search();" />
+        </div>
+    </form>
+    <table id="myTable" class="display">
+        <thead>
+            <tr>
+                <th  style="text-align:left; width:  10vw">Part #</th>
+                <th style="text-align:left; width:  18vw">PartDescription</th>
+                <th style="text-align:left; width:   5vw">ProdCode</th>
+                <th style="text-align:left; width:   5vw">ClassID</th>
+                <th style="text-align:left; width: 2.5vw">IUM</th>
+                <th style="text-align:left; width: 2.5vw">PUM</th>
+                <th style="text-align:left; width: 2.5vw">Type</th>
+                <th style="text-align:left; width:  15vw">PurComment</th>
+                <th style="text-align:left; width:  15vw">MfgComment</th>
+            </tr>
+        </thead>
+        <tbody>
+            @{
+                if( Model != null)
+                {
+                    foreach (Part p in Model)
+                    {
+                        <tr>
+                            <td>@p.PartNum</td>
+                            <td>@p.PartDescription</td>
+                            <td>@p.ProdCode</td>
+                            <td>@p.ClassID</td>
+                            <td>@p.IUM</td>
+                            <td>@p.PUM</td>
+                            <td>@p.TypeCode</td>
+                            <td>@p.PurComment</td>
+                            <td>@p.MfgComment</td>
+                        </tr>
+                    }
+                }
+            }
+        </tbody>
+    </table>
+</div>
+
+

@@ -1,0 +1,144 @@
+﻿@model POPOVendor
+@{
+    ViewData["Title"] = "PO";
+}
+<link rel="stylesheet" href="~/css/PO.css" />
+<p id="page-title" hidden >po-lookup-tab</p>
+<div id="dynamic-page-title" style="display:flex;justify-content:center; font-size:xx-large;margin-top:2vh;">PO Search</div>
+@{
+    if (Model != null)
+    {
+        <script>
+            var page_title = document.getElementById("dynamic-page-title");
+            var search_by = JSON.parse(sessionStorage.getItem("MapicsHistory")).search_by;
+            var search_phrase = JSON.parse(sessionStorage.getItem("MapicsHistory")).search_phrase;
+            switch(search_by){
+                case "PONum":   search_by = "PO Number"; break;
+                case "PartNum": search_by = "Part Number"; break;
+                case "VendID": search_by = "Vendor ID"; break;
+                case "VendName": search_by = "Vendor Name"; break;
+            }
+            page_title.innerHTML = search_by + ": " + search_phrase;
+        </script>
+    }
+}
+<div style="display:flex;margin-top:1vh;">
+    <form id="po-search-form" action="/PO/POSearch/" method="post">
+        <div id="search-title">
+            Search Criteria
+        </div>
+        <input type="text" name="search_phrase" id="search_phrase" required />
+        <div class="search-by-option">
+            <input type="radio" id="radio_po_num" name="search_field" value="PONum" class="radio_btn" required  />
+            <label for="radio_po_num">PO Number</label>
+        </div>
+        <div class="search-by-option">
+            <input type="radio" id="radio_part_num" name="search_field" value="PartNum" class="radio_btn" required />
+            <label for="radio_part_num">Part Number</label>
+        </div>
+        <div class="search-by-option">
+            <input type="radio" id="radio_vendor_id" name="search_field" value="VendID" class="radio_btn" required />
+            <label for="radio_vendor_id">Vendor ID</label>
+        </div>
+        <div class="search-by-option">
+            <input type="radio" id="radio_vendor_name" name="search_field" value="VendName" class="radio_btn" required />
+            <label for="radio_vendor_name">Vendor Name</label>
+        </div>
+        <div>
+            <input type="submit" value="Search" class="submit-button" onclick="save_search();" />
+        </div>
+    </form>
+    @{
+        if(Model == null)
+        {
+            <table id="myTable" class="display">
+                <thead>
+                    <tr>
+                        <th style="text-align:left; width:  10vw">Part #</th>
+                        <th style="text-align:left; width:  18vw">PartDescription</th>
+                        <th style="text-align:left; width:   5vw">PO Number</th>
+                        <th style="text-align:left; width:   5vw">Vendor ID</th>
+                        <th style="text-align:left; width: 15vw">Vendor Name</th>
+                        <th style="text-align:left; width:  5vw">Order Date</th>
+                        <th style="text-align:left; width:  5vw">Qty Ordered</th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        }
+        if( Model != null && Model.PO != null)
+        {
+            <table id="myTable" class="display" >
+                <thead>
+                    <tr>
+                        <th style="text-align:left; width:  10vw">Part #</th>
+                        <th style="text-align:left; width:  18vw">PartDescription</th>
+                        <th style="text-align:left; width:   5vw">PO Number</th>
+                        <th style="text-align:left; width:   5vw">Vendor ID</th>
+                        <th style="text-align:left; width: 15vw">Vendor Name</th>
+                        <th style="text-align:left; width:  5vw">Order Date</th>
+                        <th style="text-align:left; width:  5vw">Qty Ordered</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @{
+                        if (Model != null)
+                        {
+                            foreach (PO p in Model.PO)
+                            {
+                                int QtyOrd = (int)p.QtyOrdered;
+                                <tr>
+                                    <td>@p.PartNum</td>
+                                    <td>@p.PartDescription</td>
+                                    <td>@p.PONumber</td>
+                                    <td>@p.VendorID</td>
+                                    <td>@p.Name</td>
+                                    <td>@p.OrderDate</td>
+                                    <td>@QtyOrd</td>
+                                </tr>
+                            }
+                        }
+                    }
+                </tbody>
+            </table>
+        }
+        if (Model != null && Model.POVendor != null)
+        {
+            <table id="myTable" class="display" >
+                <thead>
+                    <tr>
+
+                        <th style="text-align:left; width:   5vw">PO Number</th>
+                        <th style="text-align:left; width:   5vw">Vendor ID</th>
+                        <th style="text-align:left; width: 15vw">Vendor Name</th>
+                        <th style="text-align:left; width:  5vw">Amount</th>
+                        <th style="text-align:left; width:  5vw">OrderDate</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @{
+                        if (Model != null)
+                        {
+                            foreach (POVendor p in Model.POVendor)
+                            {
+                                decimal? Amount = decimal.Round(p.Amount, 2);
+                                <tr>
+
+                                    <td>@p.PONumber</td>
+                                    <td>@p.VendorID</td>
+                                    <td>@p.Name</td>
+                                    <td>@Amount</td>
+                                    <td>@p.OrderDate</td>
+                                </tr>
+                            }
+                        }
+                    }
+                </tbody>
+            </table>
+        }
+
+    }
+</div>
+
+

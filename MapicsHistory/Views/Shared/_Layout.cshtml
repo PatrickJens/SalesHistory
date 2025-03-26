@@ -1,0 +1,108 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - MapicsHistory</title>
+    <link rel="stylesheet" href="~/mapicshistory.styles.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/_Layout.css"  />
+</head>
+<body onload="init()">
+    <div id="nav-wrapper">
+
+        <div class="navbar">
+            <div class="nav-item" id="app-title">
+                Mapics History
+            </div>
+            <a asp-area="" asp-controller="BOM" asp-action="BOMIndex" onclick="on_navigate_to_bom()">
+                <div class="nav-item" id="bom-lookup-tab">
+                    BOM Lookup
+                </div>
+            </a>
+            <a asp-area="" asp-controller="Part" asp-action="PartIndex" onclick="on_navigate_to_part()">
+                <div class="nav-item" id="part-lookup-tab">
+                    Part Lookup
+                </div>
+            </a>
+            <a asp-area="" asp-controller="PO" asp-action="POIndex" onclick="on_navigate_to_po()">
+                <div class="nav-item" id="po-lookup-tab">
+                    PO Lookup
+                </div>
+            </a>
+        </div>
+    </div>
+    <div style="font-size:10px"> ** Use =IF(LEFT(A3,1) = "#", RIGHT(A3, LEN(A3)-1), A3) to remove hashtag from excel export</div>
+    <div>
+        <main role="main" >
+            @RenderBody()
+        </main>
+    </div>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @* Source for below imports https://datatables.net/extensions/buttons/examples/initialisation/export.html *@
+    <link rel="stylesheet" type="text/css" href="~/css/dataTables.dataTables.css" />
+    <link rel="stylesheet" type="text/css" href="~/css/buttons.dataTables.min.css">
+    <script type="text/javascript" language="javascript" src="~/js/jquery-3.7.1.js"></script>
+    <script type="text/javascript" language="javascript" src="~/js/dataTables.js"></script>
+    <script type="text/javascript" language="javascript" src="~/js/dataTables.buttons.js"></script>
+    <script type="text/javascript" language="javascript" src="~/js/buttons.dataTables.js"></script>
+    <script type="text/javascript" language="javascript" src="~/js/jszip.min.js"></script>
+    <script type="text/javascript" language="javascript" src="~/js/pdfmake.min.js"></script>
+    <script type="text/javascript" language="javascript" src="~/js/vfs_fonts.js"></script>
+    <script type="text/javascript" language="javascript" src="~/js/buttons.html5.min.js"></script>
+    <script type="text/javascript" language="javascript" src="~/js/buttons.print.min.js"></script>
+    <script>
+        let table = new DataTable('#myTable', {
+            pageLength: 1000,
+            layout: {
+                topStart: {
+                    buttons: ['excel']
+                }
+            },
+            columnDefs:
+                [{ type: 'string', targets: 0 }]
+        });
+    </script>
+    <script>
+        var rows = document.getElementsByTagName('tr');
+        numRows = rows.length;
+        if( numRows > 0 )
+        {
+            for( var i = 0 ; i < rows.length-1 ; i ++ )
+            {
+                console.log(table.cell(i,0).data());
+                oldValue = table.cell(i,0).data();
+                containsLetters =  /[a-z]/i.test(oldValue);
+                startsWithZero = false;
+                endsWithZero = false;
+                length = oldValue.length;
+                if(oldValue.charAt(0) == 0){
+                    startsWithZero = true;
+                }
+                if(oldValue.charAt(length - 1) == 0 ){
+                    endsWithZero = true
+                }
+                if( !containsLetters && ( startsWithZero || endsWithZero ))
+                {
+                    newValue = '#'.concat(table.cell(i,0).data())
+                    console.log(newValue);
+                    table.cell(i,0).data( newValue )
+                        console.log( getHtmlTableCell( newValue ))
+                }
+                console.log("----------");
+            }
+        }
+        function getHtmlTableCell(value){
+            var collection = document.getElementsByClassName('sorting_1');
+            for( var i = 0 ; i < collection.length; i ++ )
+            {
+                if( collection[i].innerHTML == value ){
+                    var removedChar =  value.substring(1, value.length);
+                    collection[i].innerHTML = removedChar;
+                    return removedChar;
+                }
+            }
+        }
+    </script>
+</body>
+</html>

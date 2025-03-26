@@ -1,0 +1,122 @@
+﻿@model ParentPartBOM
+@{
+    ViewData["Title"] = "BOM";
+}
+<link rel="stylesheet" href="~/css/BOM.css" />
+<p id="page-title" hidden>bom-lookup-tab</p>
+<div id="dynamic-page-title" style="display:flex;justify-content:center; font-size:xx-large;margin-top:2vh;"> Bom Search</div>
+@{
+    if( Model != null && Model.BomList != null)
+    {
+        <script>
+            var page_title = document.getElementById("dynamic-page-title");
+            var text = page_title.innerHTML;
+            page_title.innerHTML = text + ": " + "@Model.BomList[0].ParPart";
+        </script>
+    }
+}
+
+
+<div style="display:flex;margin-top:1vh;">
+    
+    <div id="bom-left-container" style="display:flex; flex-direction:column;">
+ 
+        <form id="parent-search-form" action="/BOM/ParentPartSearch/" method="post">
+            
+            <div id="search-title"> 
+                Search Parent Part
+            </div>
+            <input type="text" name="search_phrase" id="search_phrase" required />
+            <div class="search-by-option">
+                <input type="radio" id="radio_part_num" name="search_field" value="PartNum" class="radio_btn" required />
+                <label for="radio_part_num">Part Number</label>
+            </div>
+            <div class="search-by-option">
+                <input type="radio" id="radio_part_desc" name="search_field" value="PartDescription" class="radio_btn" required />
+                <label for="radio_part_desc">Part Description</label>
+            </div>
+            <div >
+                <input type="submit" value="Search"  class="submit-button" onclick="save_search();" />
+            </div>
+        </form>
+        
+        <br />
+        
+        @{
+            if (Model != null && Model.ParentPartList != null)
+            {
+                <div id="search-title">
+                    Parent Part List
+                </div>
+            }
+        }
+        <div id="parent-part-list" >
+            @{
+                if(Model != null && Model.ParentPartList != null)
+                {
+                    foreach (ParentPart pp in Model.ParentPartList)
+                    {
+                        <form action="/BOM/BOMSearch/" method="post">
+                            <input type="radio" name="parent_part_num" value="@pp.Part" checked hidden/>
+                            <input class="pp-list-item" type="submit" value="@pp.Part" />
+                        </form>
+                    }
+                }
+            }
+
+
+        </div>
+
+    </div>
+    <table id="myTable" class="display">
+        <thead>
+            <tr>
+                <th style="text-align:left; width:  7vw">Parent Part</th>
+                <th style="text-align:left; width:  18vw">Description</th>
+                <th style="text-align:left; width:   5vw">Ext1</th>
+                <th style="text-align:left; width:   5vw">Ext2</th>
+                <th style="text-align:left; width: 2.5vw">OpSeq</th>
+                <th style="text-align:left; width: 4vw">Qty Per</th>
+                <th style="text-align:left; width:  4vw">Eff From</th>
+                <th style="text-align:left; width:  4vw">Eff To</th>
+                <th style="text-align:left; width:  5vw">Opt Code</th>
+                <th style="text-align:left; width:  5vw">Number</th>
+                <th style="text-align:left; width:  4vw">Lead Adj</th>
+                <th style="text-align:left; width:  5vw">Plan Factor</th>
+                <th style="text-align:left; width:  5vw">Cost Factor</th>
+                <th style="text-align:left; width:  5vw">User Text</th>
+                
+            </tr>
+        </thead>
+        <tbody>
+            @{
+                if( Model != null && Model.BomList != null)
+                {
+                    foreach (BOM bb in Model.BomList)
+                    {
+
+                        <tr>
+                            <td>@bb.Part</td>
+                            <td>@bb.Descr</td>
+                            <td style="max-width: 5vw; overflow: hidden;text-overflow: ellipsis;white-space: nowrap;">@bb.Ext1</td>
+                            <td style="max-width: 5vw; overflow: hidden;text-overflow: ellipsis;white-space: nowrap;">@bb.Ext2</td>
+                            <td>@bb.OpSeq</td>
+                            <td>@decimal.Round(bb.QtyPer,2)</td>
+                            <td>@bb.EffFrom</td>
+                            <td>@bb.EffTo</td>
+                            <td>@bb.OptCode</td>
+                            <td>@bb.Numbr</td>
+                            <td>@decimal.Round(bb.LeadAdj, 2)</td>
+                            <td>@decimal.Round(bb.PlanFactor,2)</td>
+                            <td>@decimal.Round(bb.CostFactor, 2)</td>
+                            <td>@bb.UserText</td>
+                        </tr>
+                    }
+                }
+            }
+        </tbody>
+    </table>
+</div>
+
+
+
